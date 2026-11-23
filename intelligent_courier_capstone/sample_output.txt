@@ -1,0 +1,62 @@
+==============================================================================
+INTELLIGENT COURIER PLANNING & ROUTE OPTIMIZATION SYSTEM
+==============================================================================
+Total Parcels Received : 8 | Vehicle Capacity : 15 kg
+Road Network Topology  : 6 Locations (Hub = 0)
+------------------------------------------------------------------------------
+
+[PHASE 2A] PRIORITIZED PARCELS (MERGE SORT OUTPUT)
+ID       Dest   Wt(kg)   Value    Deadline   Priority  
+PKG-101  2      4        45       2          1 (Urgent)
+PKG-102  4      5        60       3          1 (Urgent)
+PKG-103  5      6        70       4          1 (Urgent)
+PKG-104  1      3        30       4          2 (Express)
+PKG-106  5      2        25       5          2 (Express)
+PKG-105  3      4        40       6          2 (Express)
+PKG-108  4      3        20       10         3 (Normal)
+PKG-107  1      5        35       12         3 (Normal)
+
+[PHASE 2B] OPTIMAL PACKING PLAN (0/1 KNAPSACK DP OUTPUT)
+Selected Parcels : PKG-101, PKG-102, PKG-103
+Weight Utilized  : 15 / 15 kg (100.0% full)
+Total Value Score: 175
+
+DP Table Snapshot (Rows = First k Parcels, Cols = Capacity 0..W):
+Parcel\Cap |   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+----------------------------------------------------------------------------
+None       |   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+PKG-101    |   0   0   0   0  45  45  45  45  45  45  45  45  45  45  45  45
+PKG-102    |   0   0   0   0  45  60  60  60  60 105 105 105 105 105 105 105
+PKG-103    |   0   0   0   0  45  60  70  70  70 105 115 130 130 130 130 175
+PKG-104    |   0   0   0  30  45  60  70  75  90 105 115 130 135 145 160 175
+PKG-106    |   0   0  25  30  45  60  70  85  95 105 115 130 140 155 160 175
+PKG-105    |   0   0  25  30  45  60  70  85  95 105 115 130 140 155 160 175
+PKG-108    |   0   0  25  30  45  60  70  85  95 105 115 130 140 155 160 175
+PKG-107    |   0   0  25  30  45  60  70  85  95 105 115 130 140 155 160 175
+
+[PHASE 3A] DIJKSTRA SHORTEST PATHS FROM CENTRAL HUB (NODE 0)
+Hub 0 -> Node 0 : Distance =  0 km | Shortest Path: 0
+Hub 0 -> Node 1 : Distance =  3 km | Shortest Path: 0 -> 2 -> 1
+Hub 0 -> Node 2 : Distance =  2 km | Shortest Path: 0 -> 2
+Hub 0 -> Node 3 : Distance =  8 km | Shortest Path: 0 -> 2 -> 1 -> 3
+Hub 0 -> Node 4 : Distance = 10 km | Shortest Path: 0 -> 2 -> 1 -> 3 -> 4
+Hub 0 -> Node 5 : Distance = 13 km | Shortest Path: 0 -> 2 -> 1 -> 3 -> 4 -> 5
+
+[PHASE 3B] ORDERED DELIVERY ROUTE (NEAREST-NEIGHBOR TSP APPROXIMATION)
+  Stop 0 -> Stop 2 | Distance: 2 km | Road Path: 0 -> 2
+  Stop 2 -> Stop 4 | Distance: 8 km | Road Path: 2 -> 1 -> 3 -> 4
+  Stop 4 -> Stop 5 | Distance: 3 km | Road Path: 4 -> 5
+  Stop 5 -> Hub 0  | Distance: 13 km | Road Path: 5 -> 4 -> 3 -> 1 -> 2 -> 0
+
+Customer Visit Sequence : 0 -> 2 -> 4 -> 5 -> 0
+Complete Road Traversal : 0 -> 2 -> 1 -> 3 -> 4 -> 5 -> 4 -> 3 -> 1 -> 2 -> 0
+Total Route Length      : 26 km
+==============================================================================
+
+[PHASE 4] PERFORMANCE BENCHMARK TABLE (MILLISECONDS)
+Dataset Scale                  |  MergeSort |  Knapsack DP |   Dijkstra |   TSP (NN) |  Total (ms)
+------------------------------------------------------------------------------------------------
+Small (P=8, W=15, V=6)         |     0.0456 |       0.0757 |     0.0606 |     0.0383 |      0.2202
+Medium (P=50, W=80, V=25)      |     0.5670 |       2.5474 |     1.5396 |     0.1424 |      4.7964
+Large (P=200, W=250, V=60)     |     2.8315 |      33.9756 |    21.1865 |     0.5208 |     58.5144
+Stress (P=500, W=500, V=120)   |     7.6940 |     158.5608 |   135.8412 |     1.8383 |    303.9344
